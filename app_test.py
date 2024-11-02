@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 import math
 import random
+from stress_algorithm import overall_stress_level
+from randomHRGen import normalHRGenerator, stressHRGenerator
+from decibel_random_variation import normal_decibel_variation, stressed_decibel_variation
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -80,32 +83,16 @@ class HeartbeatSimulation(tk.Frame):
         self.controller = controller
 
         # Initial hr and noise values
+        self.baselineHR = 0
         self.hr = 25  # default value
         self.noise = 25  # default value
         self.stress = self.hr + self.noise
-        self.normalHRMin = 60
-        self.normalHRMax = 100
-        self.normalHRAvg = int((self.normalHRMin + self.normalHRMax) / 2) # average of the 2 min and max
-
-        # Stressed hr and noise values
-        self.stressHRMin = 150
-        self.stressHRMax = 220
-        self.stressHRAvg = int((self.normalHRMin + self.stressHRMax) / 2) # average of the normal min and stress max
 
         # Canvas setup
         self.canvas_width = 800
         self.canvas_height = 500
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height, bg="black")
         self.canvas.pack()
-
-        # Entry widgets for updating hr and noise
-        self.entry_hr = tk.Entry(self)
-        self.entry_hr.pack(side=tk.BOTTOM)
-        self.entry_hr.bind("<Return>", self.update_hr)
-
-        self.entry_noise = tk.Entry(self)
-        self.entry_noise.pack(side=tk.BOTTOM)
-        self.entry_noise.bind("<Return>", self.update_noise)
 
         # Line segments for the three types of lines
         self.line_segments_hr = []  # Heart rate line
@@ -118,8 +105,9 @@ class HeartbeatSimulation(tk.Frame):
         button = tk.Button(self, text="Back to Start Page", command=lambda: controller.show_page("StartPage"))
         button.pack()
 
-    def set_initial_values(self, hr, noise, stress):
+    def set_initial_values(self, hr, noise, stress=None):
         """Sets the initial hr and noise values and starts the animation."""
+        self.baselineHR = hr
         self.hr = hr
         self.noise = noise
         self.stress = self.hr + self.noise
@@ -149,40 +137,21 @@ class HeartbeatSimulation(tk.Frame):
 
     def scale_stress(self, value):
         return float(value) * -2.2 + 225
-    
-    def normalHRGenerator(self, pastVal):
-        if (pastVal == self.normalHRMin | pastVal == (self.normalHRMin + 3) | pastVal == (self.normalHRMin - 3)): # if pastVal equals the min, then generate value slightly higher than min but <= avg
-            self.normalHR = random.randint(self.normalHRMin + 3, self.normalHRAvg)
-        elif (pastVal == self.normalHRAvg): # if pastVAL equal to the peak, then generate value slightly higher than avg but <= max 
-            normalHR = random.randint(self.normalHRAvg + 3, self.normalHRMax)
-        elif (pastVal == self.normalHRMax | pastVal == (self.normalHRMax + 3) | pastVal == (self.normalHRMax - 3)): # if pastVal approx. equals the max, then generate value slightly lower than max but <= avg
-            normalHR = random.randint(self.normalHRAvg, self.normalHRMax -3)
-        elif (self.normalHRMin < pastVal < self.normalHRAvg): # if pastVal bless than peak, then generate value slightly higher than pastVal but <= avg
-            if (pastVal + 3 <= self.normalHRAvg):
-                normalHR = random.randint(pastVal + 3, self.normalHRAvg)
-            else:
-                normalHR = random.randint(self.normalHRAvg + 3, self.normalHRMax)
-        elif (self.normalHRAvg < pastVal < self.normalHRMax): # if pastVal greater than peak, then generate value slightly higher than pastVal but <= max
-            if (pastVal + 3 <= self.normalHRMax):
-                normalHR = random.randint(pastVal + 3, self.normalHRMax)
-            else:
-                normalHR = random.randint(self.normalHRAvg, pastVal)
-        else:
-            normalHR = random.randint(self.normalHRMin, self.normalHRMax)    
-        return normalHR
 
     def draw_all(self):
 
-        # Draw the heartbeat line
+        # Update and draw the heartbeat line
+        self.update_hr()
         self.draw_line(self.x_position, self.hr_scaled, "red", self.line_segments_hr)
 
         # Draw the noise line (with a slight vertical offset)
+        self.update_noise()
         self.draw_line(self.x_position, self.noise_scaled, "blue", self.line_segments_noise)
 
         # Determine the color of the stress line based on the stress value
         if self.stress < 50:
             stress_color = "green"
-        elif 50 <= self.stress < 100:
+        elif 50 <= self.stress < 80:
             stress_color = "yellow"
         else:
             stress_color = "red"
@@ -200,7 +169,7 @@ class HeartbeatSimulation(tk.Frame):
             self.shift_line_left(self.line_segments_stress)
 
         # Schedule the next segment to be drawn
-        self.after(50, self.draw_all)
+        self.after(200, self.draw_all)
 
     def draw_line(self, x_pos, y_pos, color, line_segments):
         # Draw the next line segment
@@ -228,18 +197,18 @@ class HeartbeatSimulation(tk.Frame):
         if self.x_position >= self.canvas_width:
             self.x_position = 3 * self.canvas_width // 4
 
-    def update_noise(self, event):
+    def update_noise(self):
         try:
-            self.noise = float(self.entry_noise.get())
+            self.noise = stressed_decibel_variation(self.noise)
             self.noise_scaled = self.scale_noise(self.noise)
             print(f"Updated noise to: {self.noise}, scaled: {self.noise_scaled}")
             self.update_stress()  # Call update_stress after updating noise
         except ValueError:
             print("Invalid input. Please enter a valid number.")
 
-    def update_hr(self, event):
+    def update_hr(self):
         try:
-            self.hr = float(self.entry_hr.get())
+            self.hr = stressHRGenerator(self.hr)
             self.hr_scaled = self.scale_hr(self.hr)
             print(f"Updated hr to: {self.hr}, scaled: {self.hr_scaled}")
             self.update_stress()  # Call update_stress after updating heart rate
@@ -247,7 +216,7 @@ class HeartbeatSimulation(tk.Frame):
             print("Invalid input. Please enter a valid number.")
 
     def update_stress(self):
-        self.stress = self.hr + self.noise
+        self.stress = overall_stress_level(self.baselineHR, self.hr, self.noise)
         self.stress_scaled = self.scale_stress(self.stress)
         print(f"Updated stress to: {self.stress}, scaled: {self.stress_scaled}")
 

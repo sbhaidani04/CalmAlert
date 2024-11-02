@@ -1,31 +1,44 @@
 import random
 
-def decibel_variation(cur_value, threshold = 80):
-    if (cur_value < threshold):
-        upper_bound = cur_value + 5
-        lower_bound = cur_value - 5
+# Normal decibel variation aiming for an average of 60 dB
+def normal_decibel_variation(cur_value, target=60, max_change=3):
+    # Calculate the direction to move towards the target
+    if cur_value < target:
+        change = random.uniform(0, max_change)  # Positive change
+    elif cur_value > target:
+        change = -random.uniform(0, max_change)  # Negative change
     else:
-        upper_bound = cur_value 
-        lower_bound = cur_value - 6
-    random_number = random.randint(lower_bound,upper_bound)
-    return random_number
-       
+        change = random.uniform(-max_change, max_change)  # Small fluctuation at the target
 
-# print(decibel_variation(30))
-
-def stressed_decibel_variation(cur_stressed_value, threshold = 80):
-    if (cur_stressed_value < threshold):
-        u_bound = cur_stressed_value + 4
-        l_bound = cur_stressed_value - 1
-    else:
-        u_bound = cur_stressed_value
-        l_bound = cur_stressed_value - 6
-    next_db = random.randint(l_bound,u_bound)
+    # Apply the change and constrain within reasonable bounds (e.g., 40 to 80)
+    next_db = cur_value + change
+    next_db = max(40, min(next_db, 80))  # Adjust bounds as needed
     return next_db
 
-# # Testing function: 
-# db = decibel_variation(30)
-# for i in range(100):
-#     db = decibel_variation(db)
-#     print(db)
- 
+# Stressed decibel variation aiming for an average of 90 dB
+def stressed_decibel_variation(cur_value, target=90, max_change=4):
+    # Calculate the direction to move towards the target
+    if cur_value < target:
+        change = random.uniform(0, max_change)  # Positive change
+    elif cur_value > target:
+        change = -random.uniform(0, max_change)  # Negative change
+    else:
+        change = random.uniform(-max_change, max_change)  # Small fluctuation at the target
+
+    # Apply the change and constrain within reasonable bounds (e.g., 70 to 100)
+    next_db = cur_value + change
+    next_db = max(70, min(next_db, 100))  # Adjust bounds as needed
+    return next_db
+
+# # Testing the functions
+# print("Normal Decibel Variation Test:")
+# db = 50  # Starting value
+# for _ in range(20):
+#     db = normal_decibel_variation(db)
+#     print(f"Normal dB: {db:.2f}")
+
+# print("\nStressed Decibel Variation Test:")
+# db_stressed = 85  # Starting value
+# for _ in range(20):
+#     db_stressed = stressed_decibel_variation(db_stressed)
+#     print(f"Stressed dB: {db_stressed:.2f}")
