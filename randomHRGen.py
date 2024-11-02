@@ -62,13 +62,13 @@ def stressHRGenerator(pastVal):
 
 # NORMAL TESTING       
 normalHR = random.randint(normalHRMin, normalHRMax) 
-print("Past normal stress:", normalHR) 
-print("Next normal stress:", normalHRGenerator(normalHR))
+print("Past normal HR:", normalHR) 
+print("Next normal HR:", normalHRGenerator(normalHR))
 
 # STRESS TESTING
 stressHR = random.randint(normalHRMin, stressHRMax)
-print ("Past stressed stress:", stressHR)  
-print("Next stressed stress:", stressHRGenerator(stressHR))
+print ("Past stress HR:", stressHR)  
+print("Next stress HR:", stressHRGenerator(stressHR))
 
 
 
