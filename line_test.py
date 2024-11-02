@@ -13,7 +13,7 @@ canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg="black")
 canvas.pack()
 
 # Initial y-coordinate for the baseline
-initial_y = canvas_height // 2 + 100
+initial_y = canvas_height // 2 - 50
 baseline_y = initial_y
 
 # Create a line segment that will be updated over time
@@ -70,17 +70,21 @@ def shift_line_left():
     if x_position >= canvas_width:
         x_position = 3 * canvas_width // 4
 
-# Function to update the baseline (new y-position) without redrawing the line
-def update_baseline():
+# Function to update the baseline (new y-position) when Enter is pressed
+def update_baseline(event):
     global baseline_y
-    baseline_y = int(spinbox_var.get())
+    try:
+        baseline_y = int(entry.get())
+        print(f"Updated baseline_y to: {baseline_y}")
+    except ValueError:
+        print("Invalid input. Please enter an integer.")
 
-# Create a StringVar to set the initial value of the Spinbox
-spinbox_var = tk.StringVar(value=initial_y)
+# Create an Entry widget for input
+entry = tk.Entry(root)
+entry.pack(side=tk.BOTTOM)
 
-# Create a Spinbox widget for input (with arrows to increase/decrease the value)
-spinbox = tk.Spinbox(root, from_=0, to=canvas_height, textvariable=spinbox_var, command=update_baseline)
-spinbox.pack(side=tk.BOTTOM, fill=tk.X)
+# Bind the Enter key to the update_baseline function
+entry.bind("<Return>", update_baseline)
 
 # Start the animation
 draw_heartbeat()
