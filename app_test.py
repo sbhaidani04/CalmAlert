@@ -151,7 +151,7 @@ class HeartbeatSimulation(tk.Frame):
         # Determine the color of the stress line based on the stress value
         if self.stress < 50:
             stress_color = "green"
-        elif 50 <= self.stress < 80:
+        elif 40 <= self.stress < 80:
             stress_color = "yellow"
         else:
             stress_color = "red"
@@ -208,7 +208,7 @@ class HeartbeatSimulation(tk.Frame):
 
     def update_hr(self):
         try:
-            self.hr = stressHRGenerator(self.hr)
+            self.hr = normalHRGenerator(self.hr)
             self.hr_scaled = self.scale_hr(self.hr)
             print(f"Updated hr to: {self.hr}, scaled: {self.hr_scaled}")
             self.update_stress()  # Call update_stress after updating heart rate
