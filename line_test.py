@@ -5,53 +5,87 @@ root = tk.Tk()
 root.title("Heartbeat Monitor Simulation")
 
 # Canvas dimensions
-canvas_width = 600
-canvas_height = 400
+canvas_width = 800
+canvas_height = 500
 
 # Create the canvas
 canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg="black")
 canvas.pack()
 
-# Initial y-coordinate for the baseline
-initial_y = 225
-baseline_y = initial_y
+# Initial values for hr, noise, and stress
+hr = 25
+noise = 25
+stress = hr + noise
 
-# Create a line segment that will be updated over time
-line_segments = []
+# Scale the initial values
+def scale_noise(value):
+    return float(value) * -0.4 + 490
+
+def scale_hr(value):
+    return float(value) * -2 / 7 + 3130 / 7
+
+def scale_stress(value):
+    return float(value) * -2.2 + 225
+
+hr_scaled = scale_hr(hr)
+noise_scaled = scale_noise(noise)
+stress_scaled = scale_stress(stress)
+
+# Line segments for the three types of lines
+line_segments_hr = []  # Heart rate line
+line_segments_noise = []  # Noise line
+line_segments_stress = []  # Stress line
 x_position = 0
 step = 5  # Step size for each segment
 
-# Function to draw the heartbeat line over time
-def draw_heartbeat():
-    global x_position, baseline_y
+# Function to draw all lines
+def draw_all():
+    global x_position, hr_scaled, noise_scaled, stress_scaled
 
-    # Check if the line should be drawn continuously
-    y_offset = 0
-    new_y = baseline_y + y_offset
+    # Draw the heartbeat line
+    draw_line(x_position, hr_scaled, "red", line_segments_hr)
 
-    if x_position == 0:
-        # Start the line with the first point
-        line_segments.append(canvas.create_line(x_position, new_y, x_position + step, new_y, fill="red", width=2))
+    # Draw the noise line (with a slight vertical offset)
+    draw_line(x_position, noise_scaled, "blue", line_segments_noise)
+
+    # Determine the color of the stress line based on the stress value
+    if stress < 50:
+        stress_color = "green"
+    elif 50 <= stress < 75:
+        stress_color = "yellow"
     else:
-        # Draw the next line segment
-        last_line = line_segments[-1]
-        x1, y1, x2, y2 = canvas.coords(last_line)
-        line_segments.append(canvas.create_line(x2, y2, x2 + step, new_y, fill="red", width=2))
-        print(y2)
+        stress_color = "red"
 
-    # Increment x position for the next segment
+    # Draw the stress line (with a different vertical offset)
+    draw_line(x_position, stress_scaled, stress_color, line_segments_stress)
+
+    # Increment the x position for drawing
     x_position += step
 
     # Shift the line if x_position exceeds 3/4 of the canvas width
     if x_position >= 3 * canvas_width // 4:
-        shift_line_left()
-    
+        shift_line_left(line_segments_hr)
+        shift_line_left(line_segments_noise)
+        shift_line_left(line_segments_stress)
 
     # Schedule the next segment to be drawn
-    root.after(50, draw_heartbeat)
+    root.after(50, draw_all)
+
+# Function to draw a single line segment
+def draw_line(x_pos, y_pos, color, line_segments):
+    global step
+
+    # Draw the next line segment
+    if line_segments:
+        last_line = line_segments[-1]
+        x1, y1, x2, y2 = canvas.coords(last_line)
+        line_segments.append(canvas.create_line(x2, y2, x2 + step, y_pos, fill=color, width=2))
+    else:
+        # Start the line with the first point
+        line_segments.append(canvas.create_line(x_pos, y_pos, x_pos + step, y_pos, fill=color, width=2))
 
 # Function to shift the line segments to the left
-def shift_line_left():
+def shift_line_left(line_segments):
     global x_position
 
     # Move each line segment to the left
@@ -63,28 +97,50 @@ def shift_line_left():
     while line_segments and canvas.coords(line_segments[0])[2] < 0:
         canvas.delete(line_segments.pop(0))
 
-    # Reset x_position when the line reaches the end of the canvas
+    # Reset x_position when it reaches the end of the canvas width
     if x_position >= canvas_width:
         x_position = 3 * canvas_width // 4
 
-# Function to update the baseline (new y-position) when Enter is pressed
-def update_baseline(event):
-    global baseline_y
+# Function to update noise
+def update_noise(event):
+    global noise, noise_scaled
     try:
-        baseline_y = float(entry.get())*-2.2 + 225
-        print(f"Updated baseline_y to: {baseline_y}")
+        noise = float(entry.get())
+        noise_scaled = scale_noise(noise)
+        print(f"Updated noise to: {noise}, scaled: {noise_scaled}")
+        update_stress()  # Call update_stress after updating noise
     except ValueError:
-        print("Invalid input. Please enter an integer.")
+        print("Invalid input. Please enter a valid number.")
 
-# Create an Entry widget for input
+# Function to update heart rate
+def update_hr(event):
+    global hr, hr_scaled
+    try:
+        hr = float(entry2.get())
+        hr_scaled = scale_hr(hr)
+        print(f"Updated hr to: {hr}, scaled: {hr_scaled}")
+        update_stress()  # Call update_stress after updating heart rate
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
+
+# Function to update stress based on current hr and noise
+def update_stress():
+    global stress, stress_scaled, hr, noise
+    stress = hr + noise
+    stress_scaled = scale_stress(stress)
+    print(f"Updated stress to: {stress}, scaled: {stress_scaled}")
+
+# Create Entry widgets for input
 entry = tk.Entry(root)
 entry.pack(side=tk.BOTTOM)
+entry.bind("<Return>", update_noise)
 
-# Bind the Enter key to the update_baseline function
-entry.bind("<Return>", update_baseline)
+entry2 = tk.Entry(root)
+entry2.pack(side=tk.BOTTOM)
+entry2.bind("<Return>", update_hr)
 
 # Start the animation
-draw_heartbeat()
+draw_all()
 
 # Run the application
 root.mainloop()
