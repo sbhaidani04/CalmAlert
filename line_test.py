@@ -13,16 +13,13 @@ canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg="black")
 canvas.pack()
 
 # Initial y-coordinate for the baseline
-initial_y = canvas_height // 2 - 50
+initial_y = 225
 baseline_y = initial_y
 
 # Create a line segment that will be updated over time
 line_segments = []
 x_position = 0
 step = 5  # Step size for each segment
-
-# Heartbeat pattern (simulating the y-coordinates)
-heartbeat_pattern = [0, -30, -10, -40, 0, -15, 0]  # Customizable pattern
 
 # Function to draw the heartbeat line over time
 def draw_heartbeat():
@@ -74,7 +71,7 @@ def shift_line_left():
 def update_baseline(event):
     global baseline_y
     try:
-        baseline_y = int(entry.get())
+        baseline_y = float(entry.get())*-2.2 + 225
         print(f"Updated baseline_y to: {baseline_y}")
     except ValueError:
         print("Invalid input. Please enter an integer.")
