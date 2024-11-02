@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-import math
-import random
 from stress_algorithm import overall_stress_level
 from randomHRGen import normalHRGenerator, stressHRGenerator
 from decibel_random_variation import normal_decibel_variation, stressed_decibel_variation
@@ -88,6 +86,10 @@ class HeartbeatSimulation(tk.Frame):
         self.noise = 25  # default value
         self.stress = self.hr + self.noise
 
+        # Modes for HR and Noise
+        self.hr_mode = 'normal'    # 'normal' or 'stressed'
+        self.noise_mode = 'normal' # 'normal' or 'stressed'
+
         # Canvas setup
         self.canvas_width = 800
         self.canvas_height = 500
@@ -104,6 +106,43 @@ class HeartbeatSimulation(tk.Frame):
         # Back button
         button = tk.Button(self, text="Back to Start Page", command=lambda: controller.show_page("StartPage"))
         button.pack()
+
+        # Frame for the mode buttons
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(side=tk.BOTTOM, pady=10)
+
+        # Buttons for modes
+        btn_normal = tk.Button(btn_frame, text="Normal", command=self.set_mode_normal)
+        btn_normal.pack(side=tk.LEFT, padx=5)
+
+        btn_elevated_sound = tk.Button(btn_frame, text="Elevated Sound", command=self.set_mode_elevated_sound)
+        btn_elevated_sound.pack(side=tk.LEFT, padx=5)
+
+        btn_elevated_hr = tk.Button(btn_frame, text="Elevated HR", command=self.set_mode_elevated_hr)
+        btn_elevated_hr.pack(side=tk.LEFT, padx=5)
+
+        btn_elevated_both = tk.Button(btn_frame, text="Elevated Sound + HR", command=self.set_mode_elevated_both)
+        btn_elevated_both.pack(side=tk.LEFT, padx=5)
+
+    def set_mode_normal(self):
+        self.hr_mode = 'normal'
+        self.noise_mode = 'normal'
+        print("Mode set to Normal")
+
+    def set_mode_elevated_sound(self):
+        self.hr_mode = 'normal'
+        self.noise_mode = 'stressed'
+        print("Mode set to Elevated Sound")
+
+    def set_mode_elevated_hr(self):
+        self.hr_mode = 'stressed'
+        self.noise_mode = 'normal'
+        print("Mode set to Elevated HR")
+
+    def set_mode_elevated_both(self):
+        self.hr_mode = 'stressed'
+        self.noise_mode = 'stressed'
+        print("Mode set to Elevated Sound + HR")
 
     def set_initial_values(self, hr, noise, stress=None):
         """Sets the initial hr and noise values and starts the animation."""
@@ -128,7 +167,6 @@ class HeartbeatSimulation(tk.Frame):
         # Start the animation
         self.draw_all()
     
-
     def scale_noise(self, value):
         return float(value) * -0.4 + 490
 
@@ -139,24 +177,23 @@ class HeartbeatSimulation(tk.Frame):
         return float(value) * -2.2 + 225
 
     def draw_all(self):
-
         # Update and draw the heartbeat line
         self.update_hr()
         self.draw_line(self.x_position, self.hr_scaled, "red", self.line_segments_hr)
 
-        # Draw the noise line (with a slight vertical offset)
+        # Update and draw the noise line
         self.update_noise()
         self.draw_line(self.x_position, self.noise_scaled, "blue", self.line_segments_noise)
 
         # Determine the color of the stress line based on the stress value
-        if self.stress < 50:
+        if self.stress < 30:
             stress_color = "green"
-        elif 40 <= self.stress < 80:
+        elif 30 <= self.stress < 75:
             stress_color = "yellow"
         else:
             stress_color = "red"
 
-        # Draw the stress line (with a different vertical offset)
+        # Draw the stress line
         self.draw_line(self.x_position, self.stress_scaled, stress_color, self.line_segments_stress)
 
         # Increment the x position for drawing
@@ -198,22 +235,22 @@ class HeartbeatSimulation(tk.Frame):
             self.x_position = 3 * self.canvas_width // 4
 
     def update_noise(self):
-        try:
+        if self.noise_mode == 'normal':
+            self.noise = normal_decibel_variation(self.noise)
+        else:
             self.noise = stressed_decibel_variation(self.noise)
-            self.noise_scaled = self.scale_noise(self.noise)
-            print(f"Updated noise to: {self.noise}, scaled: {self.noise_scaled}")
-            self.update_stress()  # Call update_stress after updating noise
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+        self.noise_scaled = self.scale_noise(self.noise)
+        print(f"Updated noise to: {self.noise}, scaled: {self.noise_scaled}")
+        self.update_stress()  # Call update_stress after updating noise
 
     def update_hr(self):
-        try:
+        if self.hr_mode == 'normal':
             self.hr = normalHRGenerator(self.hr)
-            self.hr_scaled = self.scale_hr(self.hr)
-            print(f"Updated hr to: {self.hr}, scaled: {self.hr_scaled}")
-            self.update_stress()  # Call update_stress after updating heart rate
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+        else:
+            self.hr = stressHRGenerator(self.hr)
+        self.hr_scaled = self.scale_hr(self.hr)
+        print(f"Updated hr to: {self.hr}, scaled: {self.hr_scaled}")
+        self.update_stress()  # Call update_stress after updating heart rate
 
     def update_stress(self):
         self.stress = overall_stress_level(self.baselineHR, self.hr, self.noise)
