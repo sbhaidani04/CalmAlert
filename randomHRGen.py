@@ -1,5 +1,4 @@
 import random
-import time
 
 # healthy heart rate (60 - 100 bpm)
 normalHRMin = 60
