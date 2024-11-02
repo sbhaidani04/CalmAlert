@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 
+import sys
+
+import algorithms.decibel_random_variation as drv
+
 class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -56,13 +60,13 @@ class StartPage(tk.Frame):
         self.entry2 = tk.Entry(self.frame)
         self.entry2.grid(row=1, column=1, padx=5, pady=5)
 
-        self.selected_color = tk.StringVar()
-        self.selected_color.set("Red")  # Default value
+        self.state = tk.StringVar()
+        self.state.set("Stressed")  # Default value
 
         # Create radio buttons
-        colors = ["Stressed", "Calm"]
-        for i in range(len(colors)):
-            radio_button = tk.Radiobutton(self.frame, text=colors[i], variable=self.selected_color, value=colors[i], command=self.pass_state)
+        states = ["Stressed", "Calm"]
+        for i in range(len(states)):
+            radio_button = tk.Radiobutton(self.frame, text=states[i], variable=self.state, value=states[i], command=self.pass_state)
             radio_button.grid(row=2,column=i)
 
         # Button to display the entered values
@@ -83,9 +87,8 @@ class StartPage(tk.Frame):
             messagebox.showerror("Invalid Input", "Please enter valid numbers")
     
     def pass_state(self):
-        """Update the result label with the selected color."""
-        selected = self.selected_color.get()
-        self.controller.pages["CalmAlert"].set_value(selected)
+        state = self.state.get()
+        self.controller.pages["CalmAlert"].set_state(state)
 
 
 class CalmAlert(tk.Frame):
@@ -100,21 +103,24 @@ class CalmAlert(tk.Frame):
         self.heart_value = None
         self.hearing_value = None
 
-        self.heart_label = tk.Label(self, text="Value from Page 1:")
+        self.heart_label = tk.Label(self, text="Heart BPM: ")
         self.heart_label.pack(pady=10)
 
         self.heart_value_label = tk.Label(self, text="")
         self.heart_value_label.pack(pady=10)
 
-        self.hearing_label = tk.Label(self, text="Value from Page 1:")
+        self.hearing_label = tk.Label(self, text="Sound dB: ")
         self.hearing_label.pack(pady=10)
 
         self.hearing_value_label = tk.Label(self, text="")
         self.hearing_value_label.pack(pady=10)
 
+        self.updateStats()
+
         button = tk.Button(self, text="Back to Start Page", 
                            command=lambda: controller.show_page("StartPage"))
         button.pack()
+
 
     def set_value(self, value, type):
         if type == "HEART":
@@ -123,12 +129,25 @@ class CalmAlert(tk.Frame):
         else:
             self.hearing_value = int(value)
             self.hearing_value_label.config(text=value)
-        
-        print(self.heart_value)
-        print(self.hearing_value)
 
     def set_state(self, value):
         self.state = value
+        print(value)
+
+    def updateStats(self):
+        print("updating")
+        if self.hearing_value != None:
+            print(self.hearing_value)
+            self.hearing_value = drv.decibel_variation(self.hearing_value)
+            self.hearing_value_label.config(text=str(self.hearing_value))
+
+            # self.heart_value = insert heart value changing function
+            # self.heart_value_label.config(text=str(self.heart_value))
+            self.after(500, self.updateStats)
+        else:
+            self.after(500, self.updateStats)
+
+    
 
 if __name__ == "__main__":
     app = MainApp()
