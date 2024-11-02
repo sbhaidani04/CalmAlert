@@ -31,4 +31,4 @@ class NormalHRGenerator:
 normalHR = NormalHRGenerator()
 pastNormalHR = random.randint(normalHR.normalHRMin, normalHR.normalHRMax)
 print("Past normal HR:", pastNormalHR)
-print("Next normal HR:", normalHR.generate(99))
+print("Next normal HR:", normalHR.generate(pastNormalHR))
