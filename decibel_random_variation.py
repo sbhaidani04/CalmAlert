@@ -1,7 +1,7 @@
 import random
 
 # Normal decibel variation aiming for an average of 60 dB
-def normal_decibel_variation(cur_value, target=60, max_change=3):
+def normal_decibel_variation(cur_value, target=60, max_change=5):
     # Calculate the direction to move towards the target
     if cur_value < target:
         change = random.uniform(0, max_change)  # Positive change
@@ -12,7 +12,6 @@ def normal_decibel_variation(cur_value, target=60, max_change=3):
 
     # Apply the change and constrain within reasonable bounds (e.g., 40 to 80)
     next_db = cur_value + change
-    next_db = max(40, min(next_db, 80))  # Adjust bounds as needed
     return next_db
 
 # Stressed decibel variation aiming for an average of 90 dB
@@ -27,7 +26,6 @@ def stressed_decibel_variation(cur_value, target=90, max_change=4):
 
     # Apply the change and constrain within reasonable bounds (e.g., 70 to 100)
     next_db = cur_value + change
-    next_db = max(70, min(next_db, 100))  # Adjust bounds as needed
     return next_db
 
 # # Testing the functions

@@ -11,7 +11,7 @@ stressHRMax = 220
 stressHRAvg = 200  # Use a value close to the middle of the stress range
 
 def normalHRGenerator(pastVal):
-    max_change = 2  # Adjust to control the rate of change
+    max_change = 4  # Adjust to control the rate of change
 
     if pastVal < normalHRAvg:
         change = random.uniform(0, max_change)
@@ -21,11 +21,10 @@ def normalHRGenerator(pastVal):
         change = random.uniform(-max_change, max_change)
 
     new_hr = pastVal + change
-    new_hr = max(normalHRMin, min(new_hr, normalHRMax))
     return new_hr
 
 def stressHRGenerator(pastVal):
-    max_change = 2  # Adjust to control the rate of change
+    max_change = 5  # Adjust to control the rate of change
 
     # Ensure pastVal fluctuates around stressHRAvg with bounded noise
     change = random.uniform(-max_change, max_change)
@@ -35,5 +34,11 @@ def stressHRGenerator(pastVal):
         change -= random.uniform(0, max_change / 2)  # Encourage a slight decrease
 
     new_hr = pastVal + change
-    new_hr = max(stressHRMin, min(new_hr, stressHRMax))
     return new_hr
+
+
+val = 60
+
+for i in range(12):
+    print(val)
+    val = stressHRGenerator(val)

@@ -23,16 +23,16 @@ def overall_stress_level(user_average_hr, user_current_hr, db_value, threshold=7
     stress_level = hr_stress + db_stress
     return stress_level
 
-# Test hr stress level:
-print("HR Stress Level Test:", hr_stress_level(60, 200))
+# # Test hr stress level:
+# print("HR Stress Level Test:", hr_stress_level(60, 200))
 
-# Test db stress level:
-print("DB Stress Level Test:", db_stress_level(80))
+# # Test db stress level:
+# print("DB Stress Level Test:", db_stress_level(80))
 
-# Test overall stress level:
-print("Overall Stress Level Test:", overall_stress_level(60, 120, 80))
+# # Test overall stress level:
+# print("Overall Stress Level Test:", overall_stress_level(60, 120, 80))
 
-# Test with various decibel levels to see how they align with the target scale
-print("\nDecibel Stress Level Tests:")
-for dB in [70, 75, 80, 85, 90, 95, 100, 110, 120]:
-    print(f"Decibels: {dB} -> Stress: {db_stress_level(dB):.2f}")
+# # Test with various decibel levels to see how they align with the target scale
+# print("\nDecibel Stress Level Tests:")
+# for dB in [70, 75, 80, 85, 90, 95, 100, 110, 120]:
+#     print(f"Decibels: {dB} -> Stress: {db_stress_level(dB):.2f}")
