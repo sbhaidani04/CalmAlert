@@ -125,4 +125,3 @@ Our goal is to transform CalmAlert into a fully functional wearable application 
 - **Jacob Mellick** - Full-Stack Developer
 - **John Alvaro** - Full-Stack Developer
 - **Grace Padberg** - Backend Developer
-```
