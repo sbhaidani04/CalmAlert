@@ -112,12 +112,23 @@ def stressed_decibel_variation(cur_value, target=90, max_change=4):
    ```
 
 ---
+## What's next for CalmAlert
 
-## Future Goals
+In addition to transforming CalmAlert into a smartwatch application, we envision several future features and integrations to enhance the user experience:
 
-Our goal is to transform CalmAlert into a fully functional wearable application for smartwatches, where it will continuously monitor and alert users of high-stress situations in real time.
+- **Breathing Routine Trigger**: In cases where CalmAlert detects a consistently high heart rate, it could automatically trigger the Apple Watch Breathing routine to help the user manage stress in real-time.
 
----
+- **Expanded Health Tracking**:
+    - **Heart Rate Variability (HRV)**: Monitoring HRV can provide deeper insights into stress levels and overall cardiovascular health.
+    - **Menstrual Cycle Tracking**: Including cycle tracking data may allow for more personalized stress management insights, as stress and heart rate can fluctuate based on hormonal cycles.
+    - **Sleep Tracking**: Integrating sleep data will help users understand how stress and sleep patterns interact, encouraging better sleep habits for stress reduction.
+    - **Physical Activity Tracking**: This feature could help differentiate between exercise-induced heart rate increases and stress-related spikes.
+
+- **Workout Mode & App Integration**: 
+    - To avoid misinterpreting elevated heart rates during physical activities, the app would allow users to select a workout mode. This lets the app know the user is actively exercising rather than in a stressful situation.
+    - **Manual Overrides**: Users could disable the app temporarily in specific contexts (e.g., during intense workouts or when in known noisy environments). After a certain period, the app may send a reminder to turn it back on if it's been disabled for too long.
+
+These extensions would enhance CalmAlert’s adaptability and make it more user-friendly across various life situations, ensuring it provides accurate stress assessments and valuable, personalized insights.
 
 ## Authors
 
