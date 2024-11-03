@@ -67,8 +67,8 @@ CalmAlert calculates stress based on two primary metrics: heart rate and environ
 
 To mimic real-world variations in heart rate and noise, we use the following simulation functions:
 
-- **Normal Decibel Variation** (targets around 60 dB)
-- **Stressed Decibel Variation** (targets around 90 dB)
+- **Normal Decibel Variation** (targets below 70 dB)
+- **Stressed Decibel Variation** (targets avove 70 dB)
 
 Example implementations:
 
@@ -101,20 +101,6 @@ def stressed_decibel_variation(cur_value, target=90, max_change=4):
 ```
 
 ---
-
-## Usage
-
-To test the functions:
-```python
-# HR Stress Level Test
-print("HR Stress Level Test:", hr_stress_level(60, 200))
-
-# dB Stress Level Test
-print("DB Stress Level Test:", db_stress_level(80))
-
-# Overall Stress Level Test
-print("Overall Stress Level Test:", overall_stress_level(60, 120, 80))
-```
 
 ### Running the Application
 
