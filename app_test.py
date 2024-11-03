@@ -58,10 +58,6 @@ class StartPage(tk.Frame):
         self.label2.grid(row=1, column=0, padx=5, pady=5)
         self.entry2 = tk.Entry(self.frame)
         self.entry2.grid(row=1, column=1, padx=5, pady=5)
-
-        # Button to display the entered values
-        submit_button = tk.Button(self.frame, text="Submit", command=self.pass_values)
-        submit_button.grid(row=2, column=0, columnspan=2, pady=10)
     
     def start_sim(self):
         self.pass_values()
@@ -226,7 +222,34 @@ class HeartbeatSimulation(tk.Frame):
         self.line_segments_hr.clear()
         self.line_segments_noise.clear()
         self.line_segments_stress.clear()
-        self.x_position = 0
+        self.x_position = 80
+
+        # Create text labels on the canvas
+        self.canvas.create_text(
+            65,
+            410,
+            text="HR",
+            anchor="e",
+            fill="red",
+            font=("Helvetica", 16)
+        )
+
+        self.canvas.create_text(
+            70,
+            470,
+            text="Noise",
+            anchor="e",
+            fill="blue",
+            font=("Helvetica", 16)
+        )
+        self.canvas.create_text(
+            80,
+            148,
+            text="Stress",
+            anchor="e",
+            fill="green",
+            font=("Helvetica", 16)
+        )
 
         # Start the animation
         self.draw_all()
@@ -294,7 +317,7 @@ class HeartbeatSimulation(tk.Frame):
             self.canvas.coords(line, x1 - self.step, y1, x2 - self.step, y2)
 
         # Remove the segments that are completely off the left edge
-        while line_segments and self.canvas.coords(line_segments[0])[2] < 0:
+        while line_segments and self.canvas.coords(line_segments[0])[2] < 80:
             self.canvas.delete(line_segments.pop(0))
 
         # Reset x_position when it reaches the end of the canvas width
